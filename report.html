@@ -1,0 +1,1924 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<title>HLint Report</title>
+<script type='text/javascript'>
+
+/* == Algorithm for show/unshow ==
+   Each hint/file is given a number, hint# or file#
+   When we say showOnly with a class name we add the rules to
+   the css #content div {display:none}, #content div.className {display:block}
+   When going back to showAll we remove these results
+*/
+
+// CSS MANIPULATION //
+
+function deleteRules(n)
+{
+    var css = document.styleSheets[0];
+    for (var i = 0; i < n; i++)
+        css.deleteRule(css.cssRules.length-1);
+}
+
+function insertRule(s)
+{
+    var css = document.styleSheets[0];
+    css.insertRule(s, css.cssRules.length);
+}
+
+// SHOW/HIDE LOGIC //
+
+/**
+ * @param {bool} [initialise=false] - Used to signal we are loading the page, so
+ the current location doesn't match our presumed state.
+ */
+function show(id, initialise=false)
+{
+    var last;
+    if (initialise)
+    {
+        last = "";
+    }
+    else
+    {
+        last = document.location.hash.slice(1);
+    }
+
+    if (id === last) return;
+    if (id.length === 0)
+    {
+        deleteRules(3);
+        insertRule(".all {font-weight: bold;}");
+    }
+    else
+    {
+        if (last.length === 0)
+        {
+            deleteRules(1);
+            insertRule("#content div {display:none;}");
+        }
+        else
+        {
+            deleteRules(2);
+        }
+        insertRule("#content div." + id + " {display:block;}");
+        insertRule("#" + id + "{font-weight:bold;}");
+    }
+
+    if (window.history)
+        history.replaceState("", document.title, window.location.pathname + window.location.search + (id === "" ? "" : "#" + id));
+    else
+        document.location.hash = '#'.concat(id);
+}
+
+</script>
+<style type="text/css">
+/* These rules are manipulated by the script.
+   The commented form is how it looks with an id selected */
+
+.all {font-weight: bold;}      /* #content div {display:none;} */
+                               /* #content div.id {display:block;} */
+                               /* #id {font-weight: bold;} */
+
+</style>
+<style type="text/css">
+/* See http://www.webreference.com/programming/css_frames/ */
+body {
+    margin:0;
+    border:0;
+    padding:0;
+    height:100%;
+    max-height:100%;
+    font-family: sans-serif;
+    font-size:76%;
+    overflow: hidden;
+}
+
+#leftbar {
+    position:absolute;
+    top:0px;
+    left:0px;
+    width: 215px;
+    bottom: 0px;
+    overflow:auto;
+    background:rgb(202,223,255);
+    margin: 10px;
+    padding-top: 0;
+    padding-left: 7px;
+    padding-right: 7px;
+    border-radius: 5px;
+
+    display:none; /* Override if script present */
+}
+
+#content {
+    position:absolute;
+    top:0;
+    bottom:0;
+    right:0;
+    overflow:auto;
+    padding-bottom: 15px;
+    padding-right: 7px;
+
+    left:10px; /* Override if script present */
+}
+
+#leftbar ul {margin-top: 0px; padding-left: 15px;}
+#leftbar p {margin-bottom: 0px;}
+.note {color: gray; font-size: smaller;}
+
+pre {
+    font-family: "lucida console", monospace;
+    padding-left: 15px;
+    margin: 2px;
+}
+
+#content div {
+    margin-bottom: 10px;
+    margin-right: 10px;
+    padding-top: 4px;
+    border-top: 1px solid #ccc;
+}
+
+.script #content {left:250px;}
+.script #leftbar {display: block;}
+
+/* From HsColour */
+.hs-keyglyph, .hs-layout {color: red;}
+.hs-keyword {color: blue;}
+.hs-comment, .hs-comment a {color: green;}
+.hs-str, .hs-chr {color: teal;}
+</style>
+</head>
+<body>
+
+<script type='text/javascript'>
+document.body.className = "script";
+</script>
+
+<div id="leftbar" valign="top" style="min-width:200px">
+
+<p><a class="all" href="javascript:show('')">All hints</a></p>
+<ul>
+<li><a id="hint0" href="javascript:show('hint0')">Warning: Eta reduce (4)</a></li>
+<li><a id="hint1" href="javascript:show('hint1')">Warning: Redundant bracket (18)</a></li>
+<li><a id="hint2" href="javascript:show('hint2')">Warning: Redundant do (8)</a></li>
+<li><a id="hint3" href="javascript:show('hint3')">Warning: Use &lt;$&gt; (3)</a></li>
+<li><a id="hint4" href="javascript:show('hint4')">Warning: Use all (4)</a></li>
+<li><a id="hint5" href="javascript:show('hint5')">Warning: Use any (1)</a></li>
+<li><a id="hint6" href="javascript:show('hint6')">Warning: Use concatMap (2)</a></li>
+<li><a id="hint7" href="javascript:show('hint7')">Warning: Use notElem (1)</a></li>
+<li><a id="hint8" href="javascript:show('hint8')">Warning: Use print (1)</a></li>
+<li><a id="hint9" href="javascript:show('hint9')">Suggestion: Avoid lambda using `infix` (3)</a></li>
+<li><a id="hint10" href="javascript:show('hint10')">Suggestion: Reduce duplication (1)</a></li>
+<li><a id="hint11" href="javascript:show('hint11')">Suggestion: Redundant $ (6)</a></li>
+<li><a id="hint12" href="javascript:show('hint12')">Suggestion: Redundant bracket (64)</a></li>
+<li><a id="hint13" href="javascript:show('hint13')">Suggestion: Use &amp;&amp; (2)</a></li>
+<li><a id="hint14" href="javascript:show('hint14')">Suggestion: Use : (1)</a></li>
+<li><a id="hint15" href="javascript:show('hint15')">Suggestion: Use String (31)</a></li>
+<li><a id="hint16" href="javascript:show('hint16')">Suggestion: Use const (1)</a></li>
+<li><a id="hint17" href="javascript:show('hint17')">Suggestion: Use list comprehension (1)</a></li>
+<li><a id="hint18" href="javascript:show('hint18')">Suggestion: Use list literal pattern (3)</a></li>
+<li><a id="hint19" href="javascript:show('hint19')">Suggestion: Use || (2)</a></li>
+</ul>
+
+<p><a class="all" href="javascript:show('')">All files</a></p>
+<ul>
+<li><a id="file0" href="javascript:show('file0')">src/GPLIenumerator.lhs (15)</a></li>
+<li><a id="file1" href="javascript:show('file1')">src/GPLIevaluator.lhs (26)</a></li>
+<li><a id="file2" href="javascript:show('file2')">src/GPLImodels.lhs (54)</a></li>
+<li><a id="file3" href="javascript:show('file3')">src/GPLIparser.lhs (62)</a></li>
+</ul>
+
+</div>
+<div id="content" valign="top" width="100%">
+<p>
+    Report generated by <a href="http://community.haskell.org/~ndm/hlint/">HLint</a>
+v2.2.11
+    - a tool to suggest improvements to your Haskell code.
+</p>
+
+<div class="hint12 file0">
+src/GPLIenumerator.lhs:13:18: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-layout'>(</span><span class='hs-varid'>take</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>[</span><span class='hs-num'>1</span> <span class='hs-keyglyph'>..</span> <span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>take</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>[</span><span class='hs-num'>1</span> <span class='hs-keyglyph'>..</span> <span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint0 file0">
+src/GPLIenumerator.lhs:16:3: Warning: Eta reduce<br/>
+Found<br/>
+<pre><span class='hs-definition'>convertdomain</span> <span class='hs-varid'>xs</span> <span class='hs-keyglyph'>=</span> <span class='hs-conid'>Domain</span> <span class='hs-varid'>xs</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>convertdomain</span> <span class='hs-keyglyph'>=</span> <span class='hs-conid'>Domain</span></pre>
+
+</div>
+
+<div class="hint15 file0">
+src/GPLIenumerator.lhs:59:15: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Char</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>String</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Char</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint12 file0">
+src/GPLIenumerator.lhs:85:17: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>allPairs''</span> <span class='hs-varid'>xs</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>allPairs'</span> <span class='hs-varid'>xs</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>allPairs''</span> <span class='hs-varid'>xs</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>allPairs'</span> <span class='hs-varid'>xs</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file0">
+src/GPLIenumerator.lhs:85:17: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>allPairs''</span> <span class='hs-varid'>xs</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>allPairs'</span> <span class='hs-varid'>xs</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>allPairs''</span> <span class='hs-varid'>xs</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-varid'>allPairs'</span> <span class='hs-varid'>xs</span></pre>
+
+</div>
+
+<div class="hint12 file0">
+src/GPLIenumerator.lhs:108:33: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-layout'>(</span><span class='hs-varid'>length</span> <span class='hs-varid'>xs</span><span class='hs-layout'>)</span> <span class='hs-varop'>^</span> <span class='hs-num'>3</span><span class='hs-layout'>)</span> <span class='hs-varop'>`div`</span> <span class='hs-layout'>(</span><span class='hs-varid'>length</span> <span class='hs-varid'>xs</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-layout'>(</span><span class='hs-varid'>length</span> <span class='hs-varid'>xs</span><span class='hs-layout'>)</span> <span class='hs-varop'>^</span> <span class='hs-num'>3</span><span class='hs-layout'>)</span> <span class='hs-varop'>`div`</span> <span class='hs-varid'>length</span> <span class='hs-varid'>xs</span></pre>
+
+</div>
+
+<div class="hint12 file0">
+src/GPLIenumerator.lhs:108:34: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>length</span> <span class='hs-varid'>xs</span><span class='hs-layout'>)</span> <span class='hs-varop'>^</span> <span class='hs-num'>3</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>length</span> <span class='hs-varid'>xs</span> <span class='hs-varop'>^</span> <span class='hs-num'>3</span></pre>
+
+</div>
+
+<div class="hint12 file0">
+src/GPLIenumerator.lhs:112:36: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>length</span> <span class='hs-varid'>xs</span><span class='hs-layout'>)</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>length</span> <span class='hs-varid'>xs</span> <span class='hs-varop'>^</span> <span class='hs-num'>2</span></pre>
+
+</div>
+
+<div class="hint12 file0">
+src/GPLIenumerator.lhs:132:32: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-layout'>(</span><span class='hs-varid'>convertdomain</span> <span class='hs-varid'>ys</span><span class='hs-layout'>)</span> <span class='hs-conop'>:</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>convertdomain</span> <span class='hs-varid'>ys</span> <span class='hs-conop'>:</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint0 file0">
+src/GPLIenumerator.lhs:141:3: Warning: Eta reduce<br/>
+Found<br/>
+<pre><span class='hs-definition'>convertmodel</span> <span class='hs-varid'>xs</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>map</span> <span class='hs-varid'>convertmodel'</span> <span class='hs-varid'>xs</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>convertmodel</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>map</span> <span class='hs-varid'>convertmodel'</span></pre>
+
+</div>
+
+<div class="hint15 file0">
+src/GPLIenumerator.lhs:146:16: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Model</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>String</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Model</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint15 file0">
+src/GPLIenumerator.lhs:149:13: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Model</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Bool</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>String</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Model</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Bool</span></pre>
+
+</div>
+
+<div class="hint15 file0">
+src/GPLIenumerator.lhs:154:11: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Model</span><span class='hs-layout'>,</span> <span class='hs-conid'>Bool</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>String</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Model</span><span class='hs-layout'>,</span> <span class='hs-conid'>Bool</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint12 file0">
+src/GPLIenumerator.lhs:159:30: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-str'>"Total number of possible models: "</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>show</span> <span class='hs-layout'>(</span><span class='hs-varid'>length</span> <span class='hs-layout'>(</span><span class='hs-varid'>cool</span> <span class='hs-varid'>x</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-str'>"Total number of possible models: "</span> <span class='hs-varop'>++</span> <span class='hs-varid'>show</span> <span class='hs-layout'>(</span><span class='hs-varid'>length</span> <span class='hs-layout'>(</span><span class='hs-varid'>cool</span> <span class='hs-varid'>x</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file0">
+src/GPLIenumerator.lhs:161:18: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>Model</span><span class='hs-layout'>,</span> <span class='hs-conid'>Bool</span><span class='hs-layout'>)</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>Model</span><span class='hs-layout'>,</span> <span class='hs-conid'>Bool</span><span class='hs-layout'>)</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>String</span></pre>
+
+</div>
+
+<div class="hint15 file1">
+src/GPLIevaluator.lhs:26:13: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-conid'>Model</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Assignment</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Model</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Assignment</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>String</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint0 file1">
+src/GPLIevaluator.lhs:27:3: Warning: Eta reduce<br/>
+Found<br/>
+<pre><span class='hs-definition'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>xs</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>map</span> <span class='hs-varid'>f</span> <span class='hs-varid'>xs</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>map</span> <span class='hs-varid'>f</span></pre>
+
+</div>
+
+<div class="hint12 file1">
+src/GPLIevaluator.lhs:47:39: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>tosing</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-layout'>(</span><span class='hs-varid'>ipreds'</span> <span class='hs-varid'>m</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>tosing</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-layout'>(</span><span class='hs-varid'>ipreds'</span> <span class='hs-varid'>m</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file1">
+src/GPLIevaluator.lhs:47:39: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>tosing</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-layout'>(</span><span class='hs-varid'>ipreds'</span> <span class='hs-varid'>m</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>tosing</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>ipreds'</span> <span class='hs-varid'>m</span> <span class='hs-varid'>x</span></pre>
+
+</div>
+
+<div class="hint12 file1">
+src/GPLIevaluator.lhs:48:41: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>topair</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-layout'>(</span><span class='hs-varid'>identity</span> <span class='hs-varid'>m</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>topair</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-layout'>(</span><span class='hs-varid'>identity</span> <span class='hs-varid'>m</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file1">
+src/GPLIevaluator.lhs:48:41: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>topair</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-layout'>(</span><span class='hs-varid'>identity</span> <span class='hs-varid'>m</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>topair</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>identity</span> <span class='hs-varid'>m</span></pre>
+
+</div>
+
+<div class="hint12 file1">
+src/GPLIevaluator.lhs:49:39: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>topair</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-layout'>(</span><span class='hs-varid'>ipreds''</span> <span class='hs-varid'>m</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>topair</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-layout'>(</span><span class='hs-varid'>ipreds''</span> <span class='hs-varid'>m</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file1">
+src/GPLIevaluator.lhs:49:39: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>topair</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-layout'>(</span><span class='hs-varid'>ipreds''</span> <span class='hs-varid'>m</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>topair</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>ipreds''</span> <span class='hs-varid'>m</span> <span class='hs-varid'>x</span></pre>
+
+</div>
+
+<div class="hint12 file1">
+src/GPLIevaluator.lhs:50:39: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>totriple</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-layout'>(</span><span class='hs-varid'>ipreds'''</span> <span class='hs-varid'>m</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>totriple</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-layout'>(</span><span class='hs-varid'>ipreds'''</span> <span class='hs-varid'>m</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file1">
+src/GPLIevaluator.lhs:50:39: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>totriple</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-layout'>(</span><span class='hs-varid'>ipreds'''</span> <span class='hs-varid'>m</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>totriple</span> <span class='hs-layout'>(</span><span class='hs-varid'>iterms</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>ipreds'''</span> <span class='hs-varid'>m</span> <span class='hs-varid'>x</span></pre>
+
+</div>
+
+<div class="hint13 file1">
+src/GPLIevaluator.lhs:52:38: Suggestion: Use &amp;&amp;<br/>
+Found<br/>
+<pre><span class='hs-definition'>and</span> <span class='hs-keyglyph'>[</span><span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>left</span><span class='hs-layout'>,</span> <span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>right</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>left</span> <span class='hs-varop'>&amp;&amp;</span> <span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>right</span></pre>
+
+</div>
+
+<div class="hint19 file1">
+src/GPLIevaluator.lhs:53:39: Suggestion: Use ||<br/>
+Found<br/>
+<pre><span class='hs-definition'>or</span> <span class='hs-keyglyph'>[</span><span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>left</span><span class='hs-layout'>,</span> <span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>right</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>left</span> <span class='hs-varop'>||</span> <span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>right</span></pre>
+
+</div>
+
+<div class="hint19 file1">
+src/GPLIevaluator.lhs:54:40: Suggestion: Use ||<br/>
+Found<br/>
+<pre><span class='hs-definition'>or</span> <span class='hs-keyglyph'>[</span><span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>first</span><span class='hs-layout'>)</span><span class='hs-layout'>,</span> <span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>second</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>not</span> <span class='hs-layout'>(</span><span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>first</span><span class='hs-layout'>)</span> <span class='hs-varop'>||</span> <span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-varid'>second</span></pre>
+
+</div>
+
+<div class="hint13 file1">
+src/GPLIevaluator.lhs:55:40: Suggestion: Use &amp;&amp;<br/>
+Found<br/>
+<pre><span class='hs-definition'>and</span>
+  <span class='hs-keyglyph'>[</span><span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-layout'>(</span><span class='hs-conid'>Conditional</span> <span class='hs-varid'>left</span> <span class='hs-varid'>right</span><span class='hs-layout'>)</span><span class='hs-layout'>,</span>
+   <span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-layout'>(</span><span class='hs-conid'>Conditional</span> <span class='hs-varid'>right</span> <span class='hs-varid'>left</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-layout'>(</span><span class='hs-conid'>Conditional</span> <span class='hs-varid'>left</span> <span class='hs-varid'>right</span><span class='hs-layout'>)</span>
+  <span class='hs-varop'>&amp;&amp;</span> <span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-varid'>g</span> <span class='hs-layout'>(</span><span class='hs-conid'>Conditional</span> <span class='hs-varid'>right</span> <span class='hs-varid'>left</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint5 file1">
+src/GPLIevaluator.lhs:56:35: Warning: Use any<br/>
+Found<br/>
+<pre><span class='hs-definition'>or</span> <span class='hs-layout'>(</span><span class='hs-varid'>map</span> <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>z</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-layout'>(</span><span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-layout'>(</span><span class='hs-varid'>newa</span> <span class='hs-varid'>g</span> <span class='hs-varid'>x</span> <span class='hs-varid'>z</span><span class='hs-layout'>)</span> <span class='hs-varid'>scope</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-varid'>domain</span> <span class='hs-varid'>m</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>any</span> <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>z</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-layout'>(</span><span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-layout'>(</span><span class='hs-varid'>newa</span> <span class='hs-varid'>g</span> <span class='hs-varid'>x</span> <span class='hs-varid'>z</span><span class='hs-layout'>)</span> <span class='hs-varid'>scope</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-varid'>domain</span> <span class='hs-varid'>m</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file1">
+src/GPLIevaluator.lhs:56:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>\</span> <span class='hs-varid'>z</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-layout'>(</span><span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-layout'>(</span><span class='hs-varid'>newa</span> <span class='hs-varid'>g</span> <span class='hs-varid'>x</span> <span class='hs-varid'>z</span><span class='hs-layout'>)</span> <span class='hs-varid'>scope</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>\</span> <span class='hs-varid'>z</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-layout'>(</span><span class='hs-varid'>newa</span> <span class='hs-varid'>g</span> <span class='hs-varid'>x</span> <span class='hs-varid'>z</span><span class='hs-layout'>)</span> <span class='hs-varid'>scope</span></pre>
+
+</div>
+
+<div class="hint4 file1">
+src/GPLIevaluator.lhs:57:33: Warning: Use all<br/>
+Found<br/>
+<pre><span class='hs-definition'>and</span> <span class='hs-layout'>(</span><span class='hs-varid'>map</span> <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>z</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-layout'>(</span><span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-layout'>(</span><span class='hs-varid'>newa</span> <span class='hs-varid'>g</span> <span class='hs-varid'>x</span> <span class='hs-varid'>z</span><span class='hs-layout'>)</span> <span class='hs-varid'>scope</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-varid'>domain</span> <span class='hs-varid'>m</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>all</span> <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>z</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-layout'>(</span><span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-layout'>(</span><span class='hs-varid'>newa</span> <span class='hs-varid'>g</span> <span class='hs-varid'>x</span> <span class='hs-varid'>z</span><span class='hs-layout'>)</span> <span class='hs-varid'>scope</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-varid'>domain</span> <span class='hs-varid'>m</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file1">
+src/GPLIevaluator.lhs:57:43: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>\</span> <span class='hs-varid'>z</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-layout'>(</span><span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-layout'>(</span><span class='hs-varid'>newa</span> <span class='hs-varid'>g</span> <span class='hs-varid'>x</span> <span class='hs-varid'>z</span><span class='hs-layout'>)</span> <span class='hs-varid'>scope</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>\</span> <span class='hs-varid'>z</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>val</span> <span class='hs-varid'>m</span> <span class='hs-layout'>(</span><span class='hs-varid'>newa</span> <span class='hs-varid'>g</span> <span class='hs-varid'>x</span> <span class='hs-varid'>z</span><span class='hs-layout'>)</span> <span class='hs-varid'>scope</span></pre>
+
+</div>
+
+<div class="hint18 file1">
+src/GPLIevaluator.lhs:61:10: Suggestion: Use list literal pattern<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>x</span> <span class='hs-conop'>:</span> <span class='hs-conid'>[]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-varid'>x</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint18 file1">
+src/GPLIevaluator.lhs:62:10: Suggestion: Use list literal pattern<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>x</span> <span class='hs-conop'>:</span> <span class='hs-varid'>y</span> <span class='hs-conop'>:</span> <span class='hs-conid'>[]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-varid'>x</span><span class='hs-layout'>,</span> <span class='hs-varid'>y</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint18 file1">
+src/GPLIevaluator.lhs:63:12: Suggestion: Use list literal pattern<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>x</span> <span class='hs-conop'>:</span> <span class='hs-varid'>y</span> <span class='hs-conop'>:</span> <span class='hs-varid'>z</span> <span class='hs-conop'>:</span> <span class='hs-conid'>[]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-varid'>x</span><span class='hs-layout'>,</span> <span class='hs-varid'>y</span><span class='hs-layout'>,</span> <span class='hs-varid'>z</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint12 file1">
+src/GPLIevaluator.lhs:68:16: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-varid'>x</span><span class='hs-layout'>,</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-keyglyph'>|</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-layout'>(</span><span class='hs-varid'>domain</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-varid'>x</span><span class='hs-layout'>,</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-keyglyph'>|</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>domain</span> <span class='hs-varid'>x</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint14 file1">
+src/GPLIevaluator.lhs:73:16: Suggestion: Use :<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-varid'>c</span><span class='hs-layout'>,</span> <span class='hs-varid'>i</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span> <span class='hs-varop'>++</span> <span class='hs-keyglyph'>[</span><span class='hs-varid'>x</span> <span class='hs-keyglyph'>|</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>g</span><span class='hs-layout'>,</span> <span class='hs-layout'>(</span><span class='hs-varid'>fst</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>/=</span> <span class='hs-varid'>c</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>c</span><span class='hs-layout'>,</span> <span class='hs-varid'>i</span><span class='hs-layout'>)</span> <span class='hs-conop'>:</span> <span class='hs-keyglyph'>[</span><span class='hs-varid'>x</span> <span class='hs-keyglyph'>|</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>g</span><span class='hs-layout'>,</span> <span class='hs-layout'>(</span><span class='hs-varid'>fst</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>/=</span> <span class='hs-varid'>c</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint12 file1">
+src/GPLIevaluator.lhs:73:41: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>fst</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>/=</span> <span class='hs-varid'>c</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>fst</span> <span class='hs-varid'>x</span> <span class='hs-varop'>/=</span> <span class='hs-varid'>c</span></pre>
+
+</div>
+
+<div class="hint15 file1">
+src/GPLIevaluator.lhs:81:20: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-conid'>Model</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Assignment</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Model</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>String</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Assignment</span></pre>
+
+</div>
+
+<div class="hint12 file1">
+src/GPLIevaluator.lhs:82:23: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-varid'>x</span><span class='hs-layout'>,</span> <span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>domain</span> <span class='hs-varid'>m</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyglyph'>|</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-layout'>(</span><span class='hs-varid'>getvars</span> <span class='hs-varid'>c</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-varid'>x</span><span class='hs-layout'>,</span> <span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>domain</span> <span class='hs-varid'>m</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyglyph'>|</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>getvars</span> <span class='hs-varid'>c</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint8 file2">
+src/GPLImodels.lhs:29:10: Warning: Use print<br/>
+Found<br/>
+<pre><span class='hs-definition'>putStrLn</span>
+  <span class='hs-layout'>(</span><span class='hs-varid'>show</span>
+     <span class='hs-layout'>(</span><span class='hs-varid'>val'</span> <span class='hs-varid'>input</span> <span class='hs-layout'>(</span><span class='hs-conid'>Model</span> <span class='hs-varid'>dom</span> <span class='hs-varid'>refassign</span> <span class='hs-varid'>oneassign</span> <span class='hs-varid'>twoassign</span> <span class='hs-varid'>thrassign</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>print</span>
+  <span class='hs-layout'>(</span><span class='hs-varid'>val'</span> <span class='hs-varid'>input</span> <span class='hs-layout'>(</span><span class='hs-conid'>Model</span> <span class='hs-varid'>dom</span> <span class='hs-varid'>refassign</span> <span class='hs-varid'>oneassign</span> <span class='hs-varid'>twoassign</span> <span class='hs-varid'>thrassign</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint2 file2">
+src/GPLImodels.lhs:38:23: Warning: Redundant do<br/>
+Found<br/>
+<pre><span class='hs-keyword'>do</span> <span class='hs-varid'>exitSuccess</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>exitSuccess</span></pre>
+
+</div>
+
+<div class="hint2 file2">
+src/GPLImodels.lhs:40:23: Warning: Redundant do<br/>
+Found<br/>
+<pre><span class='hs-keyword'>do</span> <span class='hs-varid'>mdls</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>mdls</span></pre>
+
+</div>
+
+<div class="hint2 file2">
+src/GPLImodels.lhs:52:22: Warning: Redundant do<br/>
+Found<br/>
+<pre><span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>input</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>input</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint1 file2">
+src/GPLImodels.lhs:53:29: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>input</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>input</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:57:17: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>IO</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>String</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>IO</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint12 file2">
+src/GPLImodels.lhs:61:19: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+         <span class='hs-str'>"Parse error. Please enter a list of positive integers. e.g. [1,2,3]"</span>
+       <span class='hs-varid'>requestdom</span> <span class='hs-varid'>xs</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>not</span>
+          <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed! Try again!"</span>
+           <span class='hs-varid'>requestdom</span> <span class='hs-varid'>xs</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>if</span> <span class='hs-varid'>null</span> <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"A domain must be nonempty. Try again!"</span>
+               <span class='hs-varid'>requestdom</span> <span class='hs-varid'>xs</span>
+        <span class='hs-keyword'>else</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+         <span class='hs-str'>"Parse error. Please enter a list of positive integers. e.g. [1,2,3]"</span>
+       <span class='hs-varid'>requestdom</span> <span class='hs-varid'>xs</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>not</span>
+          <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed! Try again!"</span>
+           <span class='hs-varid'>requestdom</span> <span class='hs-varid'>xs</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>if</span> <span class='hs-varid'>null</span> <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"A domain must be nonempty. Try again!"</span>
+               <span class='hs-varid'>requestdom</span> <span class='hs-varid'>xs</span>
+        <span class='hs-keyword'>else</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:61:44: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-conid'>String</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint12 file2">
+src/GPLImodels.lhs:65:24: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>not</span>
+      <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed! Try again!"</span>
+       <span class='hs-varid'>requestdom</span> <span class='hs-varid'>xs</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-varid'>null</span> <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"A domain must be nonempty. Try again!"</span>
+           <span class='hs-varid'>requestdom</span> <span class='hs-varid'>xs</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed! Try again!"</span>
+       <span class='hs-varid'>requestdom</span> <span class='hs-varid'>xs</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-varid'>null</span> <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"A domain must be nonempty. Try again!"</span>
+           <span class='hs-varid'>requestdom</span> <span class='hs-varid'>xs</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:65:65: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-conid'>String</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint11 file2">
+src/GPLImodels.lhs:69:32: Suggestion: Redundant $<br/>
+Found<br/>
+<pre><span class='hs-definition'>null</span> <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint2 file2">
+src/GPLImodels.lhs:73:34: Warning: Redundant do<br/>
+Found<br/>
+<pre><span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:78:18: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>IO</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Char</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>String</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>IO</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Char</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint1 file2">
+src/GPLImodels.lhs:83:37: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Int</span></pre>
+
+</div>
+
+<div class="hint12 file2">
+src/GPLImodels.lhs:87:20: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+         <span class='hs-str'>"Parse error. Please enter an integer from the domain. e.g. 1"</span>
+       <span class='hs-varid'>requestref</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed. Try again!"</span>
+           <span class='hs-varid'>requestref</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Referents must be elements of the domain. Try again."</span>
+               <span class='hs-varid'>requestref</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+        <span class='hs-keyword'>else</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+         <span class='hs-str'>"Parse error. Please enter an integer from the domain. e.g. 1"</span>
+       <span class='hs-varid'>requestref</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed. Try again!"</span>
+           <span class='hs-varid'>requestref</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Referents must be elements of the domain. Try again."</span>
+               <span class='hs-varid'>requestref</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+        <span class='hs-keyword'>else</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:87:45: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>String</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint12 file2">
+src/GPLImodels.lhs:91:25: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed. Try again!"</span>
+       <span class='hs-varid'>requestref</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Referents must be elements of the domain. Try again."</span>
+           <span class='hs-varid'>requestref</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed. Try again!"</span>
+       <span class='hs-varid'>requestref</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Referents must be elements of the domain. Try again."</span>
+           <span class='hs-varid'>requestref</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:91:66: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>String</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint7 file2">
+src/GPLImodels.lhs:95:38: Warning: Use notElem<br/>
+Found<br/>
+<pre><span class='hs-definition'>not</span> <span class='hs-layout'>(</span><span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>notElem</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span> <span class='hs-varid'>d</span></pre>
+
+</div>
+
+<div class="hint2 file2">
+src/GPLImodels.lhs:99:40: Warning: Redundant do<br/>
+Found<br/>
+<pre><span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:107:18: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>IO</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Char</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>String</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>IO</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Char</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint1 file2">
+src/GPLImodels.lhs:112:37: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint12 file2">
+src/GPLImodels.lhs:116:20: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+         <span class='hs-str'>"Parse error. Please enter a list of integers from the domain. e.g. [1,2]"</span>
+       <span class='hs-varid'>requestone</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>not</span>
+          <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Try again!"</span>
+           <span class='hs-varid'>requestone</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-varid'>and</span> <span class='hs-layout'>(</span><span class='hs-varid'>map</span> <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Extensions must be subsets of the domain. Try again!"</span>
+               <span class='hs-varid'>requestone</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+        <span class='hs-keyword'>else</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+         <span class='hs-str'>"Parse error. Please enter a list of integers from the domain. e.g. [1,2]"</span>
+       <span class='hs-varid'>requestone</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>not</span>
+          <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Try again!"</span>
+           <span class='hs-varid'>requestone</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-varid'>and</span> <span class='hs-layout'>(</span><span class='hs-varid'>map</span> <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Extensions must be subsets of the domain. Try again!"</span>
+               <span class='hs-varid'>requestone</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+        <span class='hs-keyword'>else</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:116:45: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-conid'>String</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint12 file2">
+src/GPLImodels.lhs:120:25: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>not</span>
+      <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Try again!"</span>
+       <span class='hs-varid'>requestone</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-varid'>and</span> <span class='hs-layout'>(</span><span class='hs-varid'>map</span> <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Extensions must be subsets of the domain. Try again!"</span>
+           <span class='hs-varid'>requestone</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Try again!"</span>
+       <span class='hs-varid'>requestone</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-varid'>and</span> <span class='hs-layout'>(</span><span class='hs-varid'>map</span> <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Extensions must be subsets of the domain. Try again!"</span>
+           <span class='hs-varid'>requestone</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:120:66: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-conid'>String</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint4 file2">
+src/GPLImodels.lhs:124:43: Warning: Use all<br/>
+Found<br/>
+<pre><span class='hs-definition'>and</span> <span class='hs-layout'>(</span><span class='hs-varid'>map</span> <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>all</span> <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint9 file2">
+src/GPLImodels.lhs:124:53: Suggestion: Avoid lambda using `infix`<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint2 file2">
+src/GPLImodels.lhs:128:40: Warning: Redundant do<br/>
+Found<br/>
+<pre><span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:133:18: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>IO</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Char</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>String</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>IO</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Char</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint1 file2">
+src/GPLImodels.lhs:138:37: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint12 file2">
+src/GPLImodels.lhs:142:20: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+         <span class='hs-str'>"Parse error. Please enter a list of pairs of integers from the domain. e.g. [(1,2),(2,2)]"</span>
+       <span class='hs-varid'>requesttwo</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>not</span>
+          <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed. Try again!"</span>
+           <span class='hs-varid'>requesttwo</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span>
+             <span class='hs-layout'>(</span><span class='hs-varid'>and</span>
+                <span class='hs-layout'>(</span><span class='hs-varid'>map</span>
+                   <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span>
+                   <span class='hs-layout'>(</span><span class='hs-varid'>simplifypairs</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+                 <span class='hs-str'>"Exensions must be pairs of elements of the domain. Try again!"</span>
+               <span class='hs-varid'>requesttwo</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+        <span class='hs-keyword'>else</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+         <span class='hs-str'>"Parse error. Please enter a list of pairs of integers from the domain. e.g. [(1,2),(2,2)]"</span>
+       <span class='hs-varid'>requesttwo</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>not</span>
+          <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed. Try again!"</span>
+           <span class='hs-varid'>requesttwo</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span>
+             <span class='hs-layout'>(</span><span class='hs-varid'>and</span>
+                <span class='hs-layout'>(</span><span class='hs-varid'>map</span>
+                   <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span>
+                   <span class='hs-layout'>(</span><span class='hs-varid'>simplifypairs</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+                 <span class='hs-str'>"Exensions must be pairs of elements of the domain. Try again!"</span>
+               <span class='hs-varid'>requesttwo</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+        <span class='hs-keyword'>else</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:142:45: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-conid'>String</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint12 file2">
+src/GPLImodels.lhs:146:25: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>not</span>
+      <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed. Try again!"</span>
+       <span class='hs-varid'>requesttwo</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span>
+         <span class='hs-layout'>(</span><span class='hs-varid'>and</span>
+            <span class='hs-layout'>(</span><span class='hs-varid'>map</span>
+               <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span>
+               <span class='hs-layout'>(</span><span class='hs-varid'>simplifypairs</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+             <span class='hs-str'>"Exensions must be pairs of elements of the domain. Try again!"</span>
+           <span class='hs-varid'>requesttwo</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-varid'>not</span>
+     <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed. Try again!"</span>
+       <span class='hs-varid'>requesttwo</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span>
+         <span class='hs-layout'>(</span><span class='hs-varid'>and</span>
+            <span class='hs-layout'>(</span><span class='hs-varid'>map</span>
+               <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span>
+               <span class='hs-layout'>(</span><span class='hs-varid'>simplifypairs</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+             <span class='hs-str'>"Exensions must be pairs of elements of the domain. Try again!"</span>
+           <span class='hs-varid'>requesttwo</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:146:66: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-conid'>String</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint4 file2">
+src/GPLImodels.lhs:150:43: Warning: Use all<br/>
+Found<br/>
+<pre><span class='hs-definition'>and</span>
+  <span class='hs-layout'>(</span><span class='hs-varid'>map</span>
+     <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-varid'>simplifypairs</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>all</span>
+  <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span> <span class='hs-layout'>(</span><span class='hs-varid'>simplifypairs</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint9 file2">
+src/GPLImodels.lhs:150:53: Suggestion: Avoid lambda using `infix`<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint2 file2">
+src/GPLImodels.lhs:154:40: Warning: Redundant do<br/>
+Found<br/>
+<pre><span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint6 file2">
+src/GPLImodels.lhs:157:22: Warning: Use concatMap<br/>
+Found<br/>
+<pre><span class='hs-definition'>concat</span> <span class='hs-layout'>(</span><span class='hs-varid'>map</span> <span class='hs-varid'>simplify</span> <span class='hs-varid'>xs</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>concatMap</span> <span class='hs-varid'>simplify</span> <span class='hs-varid'>xs</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:162:18: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>IO</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Char</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Int</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>String</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>IO</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Char</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint1 file2">
+src/GPLImodels.lhs:167:37: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint12 file2">
+src/GPLImodels.lhs:171:20: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+         <span class='hs-str'>"Parse error. Please enter a list of triples of integers from the domain. e.g. [(1,1,1),(1,2,3)]"</span>
+       <span class='hs-varid'>requestthr</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>not</span>
+          <span class='hs-layout'>(</span><span class='hs-varid'>null</span>
+             <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed. Try again!"</span>
+           <span class='hs-varid'>requestthr</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span>
+             <span class='hs-layout'>(</span><span class='hs-varid'>and</span>
+                <span class='hs-layout'>(</span><span class='hs-varid'>map</span>
+                   <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span>
+                   <span class='hs-layout'>(</span><span class='hs-varid'>simplifytriples</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+                 <span class='hs-str'>"Extensions must be triples of elements of the domain. Try again!"</span>
+               <span class='hs-varid'>requestthr</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+        <span class='hs-keyword'>else</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+         <span class='hs-str'>"Parse error. Please enter a list of triples of integers from the domain. e.g. [(1,1,1),(1,2,3)]"</span>
+       <span class='hs-varid'>requestthr</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>not</span>
+          <span class='hs-layout'>(</span><span class='hs-varid'>null</span>
+             <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed. Try again!"</span>
+           <span class='hs-varid'>requestthr</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span>
+             <span class='hs-layout'>(</span><span class='hs-varid'>and</span>
+                <span class='hs-layout'>(</span><span class='hs-varid'>map</span>
+                   <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span>
+                   <span class='hs-layout'>(</span><span class='hs-varid'>simplifytriples</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+                 <span class='hs-str'>"Extensions must be triples of elements of the domain. Try again!"</span>
+               <span class='hs-varid'>requestthr</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+        <span class='hs-keyword'>else</span>
+            <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:171:45: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-conid'>String</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint12 file2">
+src/GPLImodels.lhs:175:25: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-layout'>(</span><span class='hs-varid'>not</span>
+      <span class='hs-layout'>(</span><span class='hs-varid'>null</span>
+         <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed. Try again!"</span>
+       <span class='hs-varid'>requestthr</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span>
+         <span class='hs-layout'>(</span><span class='hs-varid'>and</span>
+            <span class='hs-layout'>(</span><span class='hs-varid'>map</span>
+               <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span>
+               <span class='hs-layout'>(</span><span class='hs-varid'>simplifytriples</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+             <span class='hs-str'>"Extensions must be triples of elements of the domain. Try again!"</span>
+           <span class='hs-varid'>requestthr</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-varid'>not</span>
+     <span class='hs-layout'>(</span><span class='hs-varid'>null</span>
+        <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>reads</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span> <span class='hs-str'>"Parse error. Almost parsed. Try again!"</span>
+       <span class='hs-varid'>requestthr</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyword'>if</span> <span class='hs-varid'>not</span>
+         <span class='hs-layout'>(</span><span class='hs-varid'>and</span>
+            <span class='hs-layout'>(</span><span class='hs-varid'>map</span>
+               <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span>
+               <span class='hs-layout'>(</span><span class='hs-varid'>simplifytriples</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>putStrLn</span>
+             <span class='hs-str'>"Extensions must be triples of elements of the domain. Try again!"</span>
+           <span class='hs-varid'>requestthr</span> <span class='hs-varid'>d</span> <span class='hs-varid'>x</span>
+    <span class='hs-keyword'>else</span>
+        <span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:175:66: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>,</span> <span class='hs-conid'>String</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint4 file2">
+src/GPLImodels.lhs:178:43: Warning: Use all<br/>
+Found<br/>
+<pre><span class='hs-definition'>and</span>
+  <span class='hs-layout'>(</span><span class='hs-varid'>map</span>
+     <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span>
+     <span class='hs-layout'>(</span><span class='hs-varid'>simplifytriples</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>all</span>
+  <span class='hs-layout'>(</span><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span>
+  <span class='hs-layout'>(</span><span class='hs-varid'>simplifytriples</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint9 file2">
+src/GPLImodels.lhs:178:53: Suggestion: Avoid lambda using `infix`<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>\</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-varid'>x</span> <span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varop'>`elem`</span> <span class='hs-varid'>d</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint2 file2">
+src/GPLImodels.lhs:183:40: Warning: Redundant do<br/>
+Found<br/>
+<pre><span class='hs-keyword'>do</span> <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>return</span> <span class='hs-layout'>(</span><span class='hs-varid'>read</span> <span class='hs-varid'>input</span> <span class='hs-keyglyph'>::</span> <span class='hs-keyglyph'>[</span><span class='hs-layout'>(</span><span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>,</span> <span class='hs-conid'>Int</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint6 file2">
+src/GPLImodels.lhs:186:24: Warning: Use concatMap<br/>
+Found<br/>
+<pre><span class='hs-definition'>concat</span> <span class='hs-layout'>(</span><span class='hs-varid'>map</span> <span class='hs-varid'>simplify</span> <span class='hs-varid'>xs</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>concatMap</span> <span class='hs-varid'>simplify</span> <span class='hs-varid'>xs</span></pre>
+
+</div>
+
+<div class="hint15 file2">
+src/GPLImodels.lhs:191:11: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Model</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Bool</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>String</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Model</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>Bool</span></pre>
+
+</div>
+
+<div class="hint12 file2">
+src/GPLImodels.lhs:197:28: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-str'>"  Referents: "</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>show</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-str'>"  Referents: "</span> <span class='hs-varop'>++</span> <span class='hs-varid'>show</span> <span class='hs-varid'>x</span></pre>
+
+</div>
+
+<div class="hint12 file2">
+src/GPLImodels.lhs:201:28: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-str'>"    One-place: "</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>show</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-str'>"    One-place: "</span> <span class='hs-varop'>++</span> <span class='hs-varid'>show</span> <span class='hs-varid'>x</span></pre>
+
+</div>
+
+<div class="hint12 file2">
+src/GPLImodels.lhs:205:28: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-str'>"    Two-place: "</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>show</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-str'>"    Two-place: "</span> <span class='hs-varop'>++</span> <span class='hs-varid'>show</span> <span class='hs-varid'>x</span></pre>
+
+</div>
+
+<div class="hint12 file2">
+src/GPLImodels.lhs:209:28: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-str'>"    Three-place: "</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>show</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-str'>"    Three-place: "</span> <span class='hs-varop'>++</span> <span class='hs-varid'>show</span> <span class='hs-varid'>x</span></pre>
+
+</div>
+
+<div class="hint17 file3">
+src/GPLIparser.lhs:10:14: Suggestion: Use list comprehension<br/>
+Found<br/>
+<pre><span class='hs-keyword'>if</span> <span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>apply</span> <span class='hs-varid'>prop</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span>
+     <span class='hs-varop'>||</span> <span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>apply</span> <span class='hs-varid'>prop</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span> <span class='hs-keyword'>then</span>
+    <span class='hs-conid'>[]</span>
+<span class='hs-keyword'>else</span>
+    <span class='hs-keyglyph'>[</span><span class='hs-varid'>fst</span> <span class='hs-varop'>$</span> <span class='hs-varid'>head</span> <span class='hs-varop'>$</span> <span class='hs-varid'>apply</span> <span class='hs-varid'>prop</span> <span class='hs-varid'>x</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-varid'>fst</span> <span class='hs-varop'>$</span> <span class='hs-varid'>head</span> <span class='hs-varop'>$</span> <span class='hs-varid'>apply</span> <span class='hs-varid'>prop</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>|</span>
+   <span class='hs-varid'>not</span>
+     <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>apply</span> <span class='hs-varid'>prop</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>||</span> <span class='hs-varid'>not</span> <span class='hs-layout'>(</span><span class='hs-varid'>null</span> <span class='hs-layout'>(</span><span class='hs-varid'>snd</span> <span class='hs-layout'>(</span><span class='hs-varid'>head</span> <span class='hs-layout'>(</span><span class='hs-varid'>apply</span> <span class='hs-varid'>prop</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-layout'>)</span><span class='hs-keyglyph'>]</span></pre>
+
+</div>
+
+<div class="hint0 file3">
+src/GPLIparser.lhs:18:3: Warning: Eta reduce<br/>
+Found<br/>
+<pre><span class='hs-definition'>apply</span> <span class='hs-layout'>(</span><span class='hs-conid'>Parser</span> <span class='hs-varid'>p</span><span class='hs-layout'>)</span> <span class='hs-varid'>s</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>p</span> <span class='hs-varid'>s</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>apply</span> <span class='hs-layout'>(</span><span class='hs-conid'>Parser</span> <span class='hs-varid'>p</span><span class='hs-layout'>)</span> <span class='hs-keyglyph'>=</span> <span class='hs-varid'>p</span></pre>
+
+</div>
+
+<div class="hint16 file3">
+src/GPLIparser.lhs:48:19: Suggestion: Use const<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>\</span> <span class='hs-varid'>s</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>[]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>const</span> <span class='hs-conid'>[]</span></pre>
+
+</div>
+
+<div class="hint15 file3">
+src/GPLIparser.lhs:67:32: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>String</span></pre>
+
+</div>
+
+<div class="hint10 file3">
+src/GPLIparser.lhs:89:16: Suggestion: Reduce duplication<br/>
+Found<br/>
+<pre><span class='hs-definition'>x</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>preds</span>
+<span class='hs-definition'>y</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>term</span>
+<span class='hs-definition'>z</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>term</span>
+</pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Combine</span> <span class='hs-varid'>with</span> <span class='hs-varid'>src</span><span class='hs-varop'>/</span><span class='hs-conid'>GPLIparser.lhs</span><span class='hs-conop'>:</span><span class='hs-num'>95</span><span class='hs-conop'>:</span><span class='hs-num'>16</span></pre>
+
+</div>
+
+<div class="hint1 file3">
+src/GPLIparser.lhs:103:21: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>c</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>c</span></pre>
+
+</div>
+
+<div class="hint15 file3">
+src/GPLIparser.lhs:106:16: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>String</span></pre>
+
+</div>
+
+<div class="hint15 file3">
+src/GPLIparser.lhs:109:12: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>String</span></pre>
+
+</div>
+
+<div class="hint15 file3">
+src/GPLIparser.lhs:112:12: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>String</span></pre>
+
+</div>
+
+<div class="hint1 file3">
+src/GPLIparser.lhs:117:20: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>c</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>c</span></pre>
+
+</div>
+
+<div class="hint3 file3">
+src/GPLIparser.lhs:120:9: Warning: Use &lt;$&gt;<br/>
+Found<br/>
+<pre><span class='hs-keyword'>do</span> <span class='hs-varid'>c</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>sat</span> <span class='hs-layout'>(</span><span class='hs-varop'>==</span> <span class='hs-chr'>'~'</span><span class='hs-layout'>)</span>
+   <span class='hs-varid'>x</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>prop</span>
+   <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-conid'>Negation</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyword'>do</span> <span class='hs-varid'>c</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>sat</span> <span class='hs-layout'>(</span><span class='hs-varop'>==</span> <span class='hs-chr'>'~'</span><span class='hs-layout'>)</span>
+   <span class='hs-conid'>Negation</span> <span class='hs-varop'>&lt;$&gt;</span> <span class='hs-varid'>prop</span></pre>
+
+</div>
+
+<div class="hint3 file3">
+src/GPLIparser.lhs:185:9: Warning: Use &lt;$&gt;<br/>
+Found<br/>
+<pre><span class='hs-keyword'>do</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>sat</span> <span class='hs-layout'>(</span><span class='hs-varop'>==</span> <span class='hs-chr'>'#'</span><span class='hs-layout'>)</span>
+   <span class='hs-varid'>c</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>sat</span> <span class='hs-layout'>(</span><span class='hs-varop'>`elem`</span> <span class='hs-varid'>variables</span><span class='hs-layout'>)</span>
+   <span class='hs-varid'>p</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>prop</span>
+   <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-conid'>Existential</span> <span class='hs-varid'>c</span> <span class='hs-varid'>p</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyword'>do</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>sat</span> <span class='hs-layout'>(</span><span class='hs-varop'>==</span> <span class='hs-chr'>'#'</span><span class='hs-layout'>)</span>
+   <span class='hs-varid'>c</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>sat</span> <span class='hs-layout'>(</span><span class='hs-varop'>`elem`</span> <span class='hs-varid'>variables</span><span class='hs-layout'>)</span>
+   <span class='hs-conid'>Existential</span> <span class='hs-varid'>c</span> <span class='hs-varop'>&lt;$&gt;</span> <span class='hs-varid'>prop</span></pre>
+
+</div>
+
+<div class="hint3 file3">
+src/GPLIparser.lhs:191:9: Warning: Use &lt;$&gt;<br/>
+Found<br/>
+<pre><span class='hs-keyword'>do</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>sat</span> <span class='hs-layout'>(</span><span class='hs-varop'>==</span> <span class='hs-chr'>'@'</span><span class='hs-layout'>)</span>
+   <span class='hs-varid'>c</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>sat</span> <span class='hs-layout'>(</span><span class='hs-varop'>`elem`</span> <span class='hs-varid'>variables</span><span class='hs-layout'>)</span>
+   <span class='hs-varid'>p</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>prop</span>
+   <span class='hs-varid'>return</span> <span class='hs-layout'>(</span><span class='hs-conid'>Universal</span> <span class='hs-varid'>c</span> <span class='hs-varid'>p</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-keyword'>do</span> <span class='hs-varid'>x</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>sat</span> <span class='hs-layout'>(</span><span class='hs-varop'>==</span> <span class='hs-chr'>'@'</span><span class='hs-layout'>)</span>
+   <span class='hs-varid'>c</span> <span class='hs-keyglyph'>&lt;-</span> <span class='hs-varid'>sat</span> <span class='hs-layout'>(</span><span class='hs-varop'>`elem`</span> <span class='hs-varid'>variables</span><span class='hs-layout'>)</span>
+   <span class='hs-conid'>Universal</span> <span class='hs-varid'>c</span> <span class='hs-varop'>&lt;$&gt;</span> <span class='hs-varid'>prop</span></pre>
+
+</div>
+
+<div class="hint1 file3">
+src/GPLIparser.lhs:210:20: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>x</span></pre>
+
+</div>
+
+<div class="hint1 file3">
+src/GPLIparser.lhs:212:24: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>x</span></pre>
+
+</div>
+
+<div class="hint1 file3">
+src/GPLIparser.lhs:214:24: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>x</span></pre>
+
+</div>
+
+<div class="hint1 file3">
+src/GPLIparser.lhs:216:24: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>x</span></pre>
+
+</div>
+
+<div class="hint1 file3">
+src/GPLIparser.lhs:218:24: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>x</span></pre>
+
+</div>
+
+<div class="hint1 file3">
+src/GPLIparser.lhs:220:24: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>x</span></pre>
+
+</div>
+
+<div class="hint1 file3">
+src/GPLIparser.lhs:222:24: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>x</span></pre>
+
+</div>
+
+<div class="hint1 file3">
+src/GPLIparser.lhs:224:24: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>x</span></pre>
+
+</div>
+
+<div class="hint1 file3">
+src/GPLIparser.lhs:226:24: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>x</span></pre>
+
+</div>
+
+<div class="hint1 file3">
+src/GPLIparser.lhs:228:24: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>x</span></pre>
+
+</div>
+
+<div class="hint1 file3">
+src/GPLIparser.lhs:230:24: Warning: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>x</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>x</span></pre>
+
+</div>
+
+<div class="hint15 file3">
+src/GPLIparser.lhs:237:21: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-conid'>Prop</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Prop</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>String</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:239:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>getpredicates1</span> <span class='hs-varid'>x</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:239:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:240:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>getpredicates1</span> <span class='hs-varid'>x</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:240:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:241:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>getpredicates1</span> <span class='hs-varid'>x</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:241:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:242:46: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>getpredicates1</span> <span class='hs-varid'>x</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:242:46: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:243:38: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-varop'>$</span> <span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint11 file3">
+src/GPLIparser.lhs:243:38: Suggestion: Redundant $<br/>
+Found<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:244:36: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-varop'>$</span> <span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint11 file3">
+src/GPLIparser.lhs:244:36: Suggestion: Redundant $<br/>
+Found<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates1</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file3">
+src/GPLIparser.lhs:250:21: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-conid'>Prop</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Prop</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>String</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:252:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>getpredicates2</span> <span class='hs-varid'>x</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:252:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:253:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>getpredicates2</span> <span class='hs-varid'>x</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:253:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:254:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>getpredicates2</span> <span class='hs-varid'>x</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:254:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:255:46: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>getpredicates2</span> <span class='hs-varid'>x</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:255:46: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:256:38: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-varop'>$</span> <span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint11 file3">
+src/GPLIparser.lhs:256:38: Suggestion: Redundant $<br/>
+Found<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:257:36: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-varop'>$</span> <span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint11 file3">
+src/GPLIparser.lhs:257:36: Suggestion: Redundant $<br/>
+Found<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates2</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file3">
+src/GPLIparser.lhs:263:21: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-conid'>Prop</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>Prop</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>String</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:265:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>getpredicates3</span> <span class='hs-varid'>x</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:265:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:266:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>getpredicates3</span> <span class='hs-varid'>x</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:266:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:267:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>getpredicates3</span> <span class='hs-varid'>x</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:267:44: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:268:46: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>getpredicates3</span> <span class='hs-varid'>x</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:268:46: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>x</span><span class='hs-layout'>)</span> <span class='hs-varop'>++</span> <span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint12 file3">
+src/GPLIparser.lhs:269:38: Suggestion: Redundant bracket<br/>
+Found<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-varop'>$</span> <span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span></pre>
+
+</div>
+
+<div class="hint11 file3">
+src/GPLIparser.lhs:269:38: Suggestion: Redundant $<br/>
+Found<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-varop'>$</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+Perhaps<br/>
+<pre><span class='hs-definition'>nub</span> <span class='hs-layout'>(</span><span class='hs-varid'>getpredicates3</span> <span class='hs-varid'>y</span><span class='hs-layout'>)</span></pre>
+
+</div>
+
+<div class="hint15 file3">
+src/GPLIparser.lhs:276:15: Suggestion: Use String<br/>
+Found<br/>
+<pre><span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-keyglyph'>[</span><span class='hs-conid'>Char</span><span class='hs-keyglyph'>]</span></pre>
+Perhaps<br/>
+<pre><span class='hs-conid'>String</span> <span class='hs-keyglyph'>-&gt;</span> <span class='hs-conid'>String</span></pre>
+
+</div>
+
+</div>
+<script type='text/javascript'>
+show(window.location.hash.slice(1), true);
+</script>
+</body>
+</html>
